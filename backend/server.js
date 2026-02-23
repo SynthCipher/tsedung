@@ -2,65 +2,47 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config";
 import connectDB from "./config/mongodb.js";
-import connectCloudinary from "./config/cloudinary.js";
-import userRouter from "./routes/userRoute.js";
-import productRouter from "./routes/productRoute.js";
-import cartRouter from "./routes/cartRoute.js";
-import orderRouter from "./routes/orderRoute.js";
+import contactRouter from "./routes/contactRoute.js";
 
 // APP CONFIG
 const app = express();
 const port = process.env.PORT || 8080;
 connectDB();
-connectCloudinary();
+// connectCloudinary();
 // MIDDLE WARE
 app.use(express.json());
-app.use(cors());
+app.use((req, res, next) => {
+  console.log(`[${new Date().toLocaleTimeString()}] ${req.method} request to: ${req.url}`);
+  next();
+});
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+  "https://jigmatdorjey.vercel.app",
 
-// API END POINT
-app.use("/api/user", userRouter);
-app.use("/api/product", productRouter);
-app.use("/api/cart", cartRouter);
-app.use("/api/order", orderRouter);
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "X-Requested-With", "Authorization"],
+  })
+);
+
+
+
+app.use("/api", contactRouter);
 
 app.get("/", (req, res) => {
   res.send("hello Server is Working");
-  
+});
+
+app.listen(port, () => {
+  console.log(`Server started on port ${port}`);
 });
 
 
-
-// Set up a webhook endpoint in your backend
-app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) => {
-  const sig = req.headers['stripe-signature'];
-  let event;
-
-  try {
-    // Verify the event came from Stripe
-    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
-  } catch (err) {
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-
-  // Handle the event
-  if (event.type === 'payment_intent.succeeded') {
-    const paymentIntent = event.data.object;
-    // Update your order in the database
-    await orderModel.findOneAndUpdate(
-      { paymentIntentId: paymentIntent.id },
-      { payment: true }
-    );
-    // Clear the user's cart
-    const order = await orderModel.findOne({ paymentIntentId: paymentIntent.id });
-    if (order) {
-      await userModel.findByIdAndUpdate(order.userId, { cartData: {} });
-    }
-  }
-
-  res.status(200).send();
-});
-
-
-app.listen(port, (req, res) => {
-  console.log("app is litenign to port : ", port);
-});

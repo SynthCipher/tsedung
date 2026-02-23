@@ -1,31 +1,57 @@
 @import "tailwindcss";
 
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Prata&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Outfit:wght@100..900&family=Noto+Serif+Tibetan:wght@100..900&display=swap");
+
+@theme {
+  --color-romantic-red: #ff004f;
+  --color-soft-rose: #ff8b94;
+  --color-love-bg: #fff5f5;
+  --color-deep-text: #4a0e0e;
+  --color-gold: #ffd700;
+  
+  --font-playfair: "Playfair Display", serif;
+  --font-outfit: "Outfit", sans-serif;
+}
+
+:root {
+  --romantic-gradient: linear-gradient(135deg, #fff5f5 0%, #ffe4e4 100%);
+  background: var(--romantic-gradient);
+}
 
 * {
-  font-family: "Outfit", sans-serif;
-}
-.prata-regular {
-  font-family: "Prata", serif;
-  font-weight: 400;
-  font-style: normal;
-}
-a.active hr {
-  display: block;
+  font-family: var(--font-outfit);
 }
 
-.sidebar-link.active {
-  background-color: black;
+h1, h2, h3, .serif {
+  font-family: var(--font-playfair);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.floating {
+  animation: floating 3s ease-in-out infinite;
+}
+
+@keyframes floating {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+::selection {
+  background: var(--color-romantic-red);
   color: white;
 }
 
-@media (max-width: 640px) {
-  a.active {
-    background-color: black;
-    color: white;
-  }
+::-webkit-scrollbar {
+  width: 6px;
 }
 
-::-webkit-scrollbar{
-  display: none;
+::-webkit-scrollbar-thumb {
+  background: var(--color-soft-rose);
+  border-radius: 10px;
 }
